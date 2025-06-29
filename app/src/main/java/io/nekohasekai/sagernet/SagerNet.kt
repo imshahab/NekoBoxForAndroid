@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.PowerManager
 import android.os.StrictMode
 import android.os.UserManager
+import com.google.android.material.color.DynamicColors
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
@@ -50,6 +51,8 @@ class SagerNet : Application(),
 
     override fun onCreate() {
         super.onCreate()
+
+        DynamicColors.applyToActivitiesIfAvailable(this)
 
         System.setProperty(DEBUG_PROPERTY_NAME, DEBUG_PROPERTY_VALUE_ON)
         Thread.setDefaultUncaughtExceptionHandler(CrashHandler)
