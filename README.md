@@ -5,6 +5,7 @@
 [![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 sing-box / universal proxy toolchain for Android.
+The interface now adopts Material Design 3 with dynamic color theming.
 
 一款使用 sing-box 的 Android 通用代理软件.
 
