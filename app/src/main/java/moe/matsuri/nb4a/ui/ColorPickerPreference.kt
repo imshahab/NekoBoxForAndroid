@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.res.TypedArrayUtils
@@ -17,9 +18,11 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.setPadding
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
+import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.ktx.getColorAttr
+import io.nekohasekai.sagernet.utils.Theme
 import kotlin.math.roundToInt
 
 class ColorPickerPreference
@@ -82,6 +85,48 @@ class ColorPickerPreference
 
         lateinit var dialog: AlertDialog
 
+        val mainLayout = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+
+        // Add Dynamic Colors option if available (Android 12+)
+        if (DynamicColors.isDynamicColorAvailable()) {
+            val dynamicOption = LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(32, 24, 32, 24)
+                setOnClickListener {
+                    persistInt(Theme.DYNAMIC)
+                    dialog.dismiss()
+                    callChangeListener(Theme.DYNAMIC)
+                }
+
+                // Dynamic colors icon (using system accent color)
+                val dynamicColor = context.getColorAttr(com.google.android.material.R.attr.colorPrimary)
+                addView(getNekoImageViewAtColor(dynamicColor, 48, 0))
+
+                // Label
+                addView(TextView(context).apply {
+                    text = context.getString(R.string.theme_dynamic)
+                    textSize = 16f
+                    setPadding(16, 0, 0, 0)
+                })
+            }
+            mainLayout.addView(dynamicOption)
+
+            // Divider
+            mainLayout.addView(View(context).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, 1
+                )
+                setBackgroundColor(context.getColorAttr(com.google.android.material.R.attr.colorOutline))
+            })
+        }
+
         val grid = GridLayout(context).apply {
             columnCount = 4
 
@@ -104,14 +149,10 @@ class ColorPickerPreference
 
         }
 
+        mainLayout.addView(grid)
+
         dialog = MaterialAlertDialogBuilder(context).setTitle(title)
-            .setView(LinearLayout(context).apply {
-                gravity = Gravity.CENTER
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-                addView(grid)
-            })
+            .setView(mainLayout)
             .setNegativeButton(android.R.string.cancel, null)
             .show()
     }

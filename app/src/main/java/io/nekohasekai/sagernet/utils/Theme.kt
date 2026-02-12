@@ -2,13 +2,16 @@ package io.nekohasekai.sagernet.utils
 
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.material.color.DynamicColors
 import io.nekohasekai.sagernet.R
 import io.nekohasekai.sagernet.database.DataStore
 import io.nekohasekai.sagernet.ktx.app
 
 object Theme {
 
+    const val DYNAMIC = 0
     const val RED = 1
     const val PINK_SSR = 2
     const val PINK = 3
@@ -31,14 +34,29 @@ object Theme {
     const val BLUE_GREY = 20
     const val BLACK = 21
 
-    private fun defaultTheme() = PINK_SSR
+    private fun defaultTheme() = if (DynamicColors.isDynamicColorAvailable()) DYNAMIC else PINK_SSR
 
     fun apply(context: Context) {
-        context.setTheme(getTheme())
+        val theme = DataStore.appTheme
+        if (theme == DYNAMIC && DynamicColors.isDynamicColorAvailable()) {
+            // Dynamic colors will be applied via DynamicColors.applyToActivityIfAvailable
+            context.setTheme(R.style.Theme_SagerNet)
+        } else {
+            context.setTheme(getTheme(theme))
+        }
     }
 
     fun applyDialog(context: Context) {
-        context.setTheme(getDialogTheme())
+        val theme = DataStore.appTheme
+        if (theme == DYNAMIC && DynamicColors.isDynamicColorAvailable()) {
+            context.setTheme(R.style.Theme_SagerNet_Dialog)
+        } else {
+            context.setTheme(getDialogTheme(theme))
+        }
+    }
+
+    fun isDynamicColorEnabled(): Boolean {
+        return DataStore.appTheme == DYNAMIC && DynamicColors.isDynamicColorAvailable()
     }
 
     fun getTheme(): Int {
@@ -51,6 +69,7 @@ object Theme {
 
     fun getTheme(theme: Int): Int {
         return when (theme) {
+            DYNAMIC -> R.style.Theme_SagerNet
             RED -> R.style.Theme_SagerNet_Red
             PINK -> R.style.Theme_SagerNet
             PINK_SSR -> R.style.Theme_SagerNet_Pink_SSR
@@ -78,6 +97,7 @@ object Theme {
 
     fun getDialogTheme(theme: Int): Int {
         return when (theme) {
+            DYNAMIC -> R.style.Theme_SagerNet_Dialog
             RED -> R.style.Theme_SagerNet_Dialog_Red
             PINK -> R.style.Theme_SagerNet_Dialog
             PINK_SSR -> R.style.Theme_SagerNet_Dialog_Pink_SSR

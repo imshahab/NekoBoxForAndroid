@@ -16,6 +16,7 @@ import android.os.UserManager
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
+import com.google.android.material.color.DynamicColors
 import go.Seq
 import io.nekohasekai.sagernet.bg.SagerConnection
 import io.nekohasekai.sagernet.database.DataStore
@@ -79,6 +80,10 @@ class SagerNet : Application(),
         }
 
         if (isMainProcess) {
+            // Apply dynamic colors (Material You) on Android 12+ when enabled
+            if (Theme.isDynamicColorEnabled()) {
+                DynamicColors.applyToActivitiesIfAvailable(this)
+            }
             Theme.apply(this)
             Theme.applyNightTheme()
             runOnDefaultDispatcher {
